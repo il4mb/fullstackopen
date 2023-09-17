@@ -5,9 +5,9 @@ import './App.css'
 
 
 
-const Header = (params = { title: "" }) => {
+const Header = ({ course }) => {
   return (
-    <h1>{params.title}</h1>
+    <h1>{course}</h1>
   )
 }
 
@@ -36,7 +36,9 @@ const Total = (params = { title: "", parts: [] }) => {
 
 const App = () => {
 
-  const course = {
+  const course = "Half Stack application development";
+
+  const courses = {
     "title": 'Half Stack application development',
     "parts": [
       {
@@ -57,9 +59,9 @@ const App = () => {
 
   return (
     <div>
-      <Header title={course.title} />
-      <Content parts={course.parts} />
-      <Total title={course.title} parts={course.parts} />
+      <Header course={course}/>
+      <Content part={courses.parts} />
+      <Total title={courses.title} parts={courses.parts} />
     </div>
   )
 }
