@@ -1,10 +1,17 @@
 import Person from "./Person";
 
-const Persons = ({ persons = [] }) => {
+const Persons = ({ persons = [], deleteHandler }) => {
 
     return (
         <>
-            {persons.map((person) => <Person name={person.name} number={person.number} key={person.id} />)}
+            {persons.map((person) =>
+                <Person
+                    name={person.name}
+                    number={person.number}
+                    id={person.id}
+                    deleteCallback={deleteHandler}
+                    key={person.id}/>
+            )}
         </>
     )
 }
