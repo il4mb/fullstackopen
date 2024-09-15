@@ -18,16 +18,13 @@ const PersonForm = ({ callback }) => {
 
         event.preventDefault();
         setFeedback(null);
-        
-        callback(name, number)
-            .then(e => {
-                setName("");
-                setNumber("");
-            })
-            .catch(err => {
-                console.log(err)
-                setFeedback(err);
-            })
+
+        callback(name, number).then(e => {
+            setName("");
+            setNumber("");
+        }).catch(err => {
+
+        })
     }
 
     return (

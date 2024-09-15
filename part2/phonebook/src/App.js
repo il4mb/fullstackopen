@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
-import axios from "axios";
 import Notification from './components/Notification';
+import service from './services/persons';
 
 const App = () => {
 
@@ -15,11 +15,15 @@ const App = () => {
 
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then(response => {
-      console.log('promise fulfilled')
-      setPersons(response.data)
-    });
+    service.getAll()
+      .then((response) => {
+        setPersons(Array.isArray(response) ? response : []);
+      })
+      .catch((error) => {
+        console.error('Error fetching persons:', error);
+      });
   }, []);
+
 
 
   const [filter, setFilter] = useState("");
@@ -27,65 +31,49 @@ const App = () => {
     setFilter(event.target.value);
   }
 
-  const shownPerson = persons.filter(person =>
+  const shownPerson = persons?.filter(person =>
     person.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   const addPersonHandler = (name, number) => {
-    return new Promise((resolve, reject) => {
-      if (!/^[0-9-]+$/.test(number)) {
-        reject("Please enter number only [0-9] or separate with a dash (-)");
-      } else {
-        try {
-          const personObject = {
-            name, number, id: String(Math.max(...persons.map(person => Number(person.id))) + 1),
-          }
 
-          axios.post('http://localhost:3001/persons', personObject).then(response => {
-            setPersons(persons.concat(personObject));
-            resolve();
-
-            setNotification({
-              message: "Added " + personObject.name,
-              type: "success"
-            });
-          });
-
-        } catch (err) {
-          reject(err.message);
-        }
-      }
-    });
+    return new Promise((eccept, reject) => {
+      service.create({ name, number })
+        .then((person) => {
+          eccept(person);
+          setPersons(persons.concat(person));
+          setNotification({
+            message: `Added ${name} number ${number} to phonebook`,
+            type: "success"
+          })
+        })
+        .catch(error => {
+          setNotification({
+            message: error.message,
+            type: "danger"
+          })
+          reject(error);
+        })
+    })
   };
 
 
   const deleteHandler = (id) => {
 
     if (window.confirm(`Are you sure to delete person with id ${id}?, this action canot undone!`)) {
-      try {
-
-        const person = persons.find(p => p.id == id);
-        if (!person) {
-          setNotification({
-            message: `Cauld't remove ${id}, person not found!`,
-            type: "danger"
-          });
-          return;
-        }
-
-        axios.delete(`http://localhost:3001/persons/${id}`).then(response => {
-          setPersons(persons => persons.filter(p => p.id != person.id));
-          setNotification({
-            message: `Information ${person.name} has ben removed from the server!`,
-            type: "danger"
-          });
-        });
-
-      } catch (err) {
-        console.error(err.message);
-      }
+      service.remove(id).then(() => {
+        setPersons(persons => persons.filter(p => p.id != id));
+        setNotification({
+          message: `Removed ${id} from phonebook`,
+          type: "success"
+        })
+      }).catch(err => {
+        setNotification({
+          message: err.message,
+          type: "danger"
+        })
+      })
     }
-
   }
 
 

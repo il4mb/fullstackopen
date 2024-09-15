@@ -78,7 +78,7 @@ const commandHandlers = [
 
             try {
                 await person.save();
-                console.log(`added ${content} important ${Boolean(important) ? "TRUE" : "FASLE"} to phonebook`);
+                console.log(`added ${content} important ${important ? "TRUE" : "FASLE"} to phonebook`);
             } catch (error) {
                 console.error('Error saving person:', error.message);
             }
